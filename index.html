@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git & GitHub Docs — Kunal Gaikwad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --border2: #21262d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --accent: #f78166;
+    --accent2: #79c0ff;
+    --accent3: #56d364;
+    --accent4: #d2a8ff;
+    --accent5: #ffa657;
+    --sidebar-w: 280px;
+    --toc-w: 220px;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Geist', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* TOPBAR */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px;
+    background: rgba(13,17,23,0.95);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px;
+    z-index: 100; backdrop-filter: blur(12px);
+    gap: 16px;
+  }
+  .topbar-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 16px; color: var(--text);
+    text-decoration: none; letter-spacing: -0.3px;
+  }
+  .topbar-logo svg { color: var(--accent); }
+  .topbar-divider { width: 1px; height: 20px; background: var(--border); }
+  .topbar-title { font-size: 14px; color: var(--text2); font-weight: 500; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topbar-badge {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); font-size: 12px; padding: 3px 10px;
+    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+  }
+  .topbar-gh-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 12px; border-radius: var(--radius);
+    font-size: 13px; text-decoration: none; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .topbar-gh-btn:hover { background: var(--bg2); border-color: var(--accent2); color: var(--accent2); }
+
+  /* LAYOUT */
+  .layout { display: flex; margin-top: 56px; min-height: calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: fixed; top: 56px; bottom: 0; left: 0;
+    overflow-y: auto; overflow-x: hidden;
+    background: var(--bg); border-right: 1px solid var(--border);
+    padding: 24px 0 40px;
+  }
+  .sidebar-section { margin-bottom: 8px; }
+  .sidebar-section-title {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 12px 20px 6px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 20px; font-size: 13.5px; color: var(--text2);
+    text-decoration: none; cursor: pointer; border-radius: 0;
+    transition: all 0.12s; position: relative;
+    border-left: 2px solid transparent;
+  }
+  .sidebar-link:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .sidebar-link.active {
+    color: var(--accent2); background: rgba(121,192,255,0.08);
+    border-left-color: var(--accent2); font-weight: 500;
+  }
+  .sidebar-link .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border); flex-shrink: 0; transition: background 0.12s;
+  }
+  .sidebar-link.active .dot, .sidebar-link:hover .dot { background: var(--accent2); }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left: var(--sidebar-w);
+    margin-right: var(--toc-w);
+    flex: 1; max-width: 820px; padding: 48px 56px 80px;
+  }
+
+  /* TOC */
+  .toc {
+    width: var(--toc-w); flex-shrink: 0;
+    position: fixed; top: 56px; right: 0; bottom: 0;
+    overflow-y: auto; padding: 32px 20px 40px;
+    border-left: 1px solid var(--border);
+  }
+  .toc-title {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+  }
+  .toc-link {
+    display: block; font-size: 12.5px; color: var(--text3);
+    text-decoration: none; padding: 3px 0 3px 10px;
+    border-left: 1px solid var(--border);
+    transition: all 0.12s; cursor: pointer;
+  }
+  .toc-link:hover, .toc-link.active { color: var(--accent2); border-left-color: var(--accent2); }
+  .toc-link.level-3 { padding-left: 22px; }
+
+  /* PAGE SECTIONS */
+  .page { display: none; animation: fadein 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--text3); margin-bottom: 20px;
+  }
+  .breadcrumb a { color: var(--text3); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent2); }
+  .breadcrumb-sep { color: var(--border); }
+
+  /* PAGE HEADER */
+  .page-tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    color: var(--accent); background: rgba(247,129,102,0.1);
+    border: 1px solid rgba(247,129,102,0.25);
+    padding: 2px 10px; border-radius: 20px; margin-bottom: 16px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  h1 {
+    font-size: 32px; font-weight: 700; line-height: 1.2;
+    color: var(--text); letter-spacing: -0.5px; margin-bottom: 12px;
+  }
+  .page-subtitle {
+    font-size: 16px; color: var(--text2); margin-bottom: 32px;
+    font-weight: 400; line-height: 1.5;
+  }
+  .page-divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* TYPOGRAPHY */
+  h2 {
+    font-size: 20px; font-weight: 600; color: var(--text);
+    margin: 40px 0 12px; letter-spacing: -0.2px;
+    padding-top: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2::before {
+    content: ''; display: block; width: 3px; height: 20px;
+    background: var(--accent2); border-radius: 2px; flex-shrink: 0;
+  }
+  h3 {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; letter-spacing: -0.1px;
+  }
+  p { color: var(--text2); margin-bottom: 16px; line-height: 1.75; }
+  strong { color: var(--text); font-weight: 600; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* CODE */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; background: var(--bg3);
+    padding: 2px 6px; border-radius: 4px;
+    color: var(--accent5); border: 1px solid var(--border2);
+  }
+  pre {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0;
+    margin: 16px 0; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .pre-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .pre-lang {
+    font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .copy-btn {
+    font-size: 11px; color: var(--text3); background: none; border: none;
+    cursor: pointer; padding: 2px 8px; border-radius: 4px;
+    transition: all 0.12s; font-family: 'Geist', sans-serif;
+  }
+  .copy-btn:hover { color: var(--text); background: var(--border); }
+  .copy-btn.copied { color: var(--accent3); }
+  pre code {
+    display: block; padding: 16px; background: none;
+    color: var(--text); border: none; border-radius: 0;
+    font-size: 13px; line-height: 1.65; overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* CALLOUTS */
+  .callout {
+    border-radius: var(--radius); padding: 14px 16px;
+    margin: 20px 0; border-left: 3px solid;
+    display: flex; gap: 10px;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body p { margin: 0; font-size: 14px; }
+  .callout.info { background: rgba(121,192,255,0.07); border-color: var(--accent2); }
+  .callout.info .callout-icon::after { content: 'ℹ'; }
+  .callout.warn { background: rgba(255,166,87,0.07); border-color: var(--accent5); }
+  .callout.warn .callout-icon::after { content: '⚠'; }
+  .callout.success { background: rgba(86,211,100,0.07); border-color: var(--accent3); }
+  .callout.success .callout-icon::after { content: '✓'; }
+  .callout.danger { background: rgba(247,129,102,0.07); border-color: var(--accent); }
+  .callout.danger .callout-icon::after { content: '🔥'; }
+
+  /* LISTS */
+  ul, ol {
+    padding-left: 24px; color: var(--text2); margin-bottom: 16px;
+  }
+  li { margin-bottom: 6px; line-height: 1.7; }
+  li code { font-size: 12.5px; }
+
+  /* TABLES */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  th {
+    background: var(--bg3); color: var(--text); font-weight: 600;
+    padding: 10px 14px; text-align: left; border: 1px solid var(--border);
+    font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  td { padding: 10px 14px; border: 1px solid var(--border); color: var(--text2); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* CARDS GRID */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 24px 0; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; cursor: pointer;
+    transition: all 0.15s; text-decoration: none;
+  }
+  .card:hover { border-color: var(--accent2); background: rgba(121,192,255,0.04); transform: translateY(-1px); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .card-desc { font-size: 12.5px; color: var(--text3); line-height: 1.5; }
+
+  /* OBJECT BOXES for git internals */
+  .git-objects { display: flex; gap: 16px; margin: 20px 0; flex-wrap: wrap; }
+  .git-obj {
+    flex: 1; min-width: 160px; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .git-obj-type {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .git-obj-type.commit { color: var(--accent); }
+  .git-obj-type.tree { color: var(--accent3); }
+  .git-obj-type.blob { color: var(--accent2); }
+  .git-obj ul { margin: 0; padding-left: 16px; }
+  .git-obj li { font-size: 12.5px; color: var(--text3); margin-bottom: 3px; }
+
+  /* STEPS */
+  .steps { counter-reset: step; margin: 20px 0; }
+  .step {
+    display: flex; gap: 16px; margin-bottom: 24px;
+    counter-increment: step;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: var(--bg3); border: 2px solid var(--accent2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace; margin-top: 2px;
+  }
+  .step-content { flex: 1; }
+  .step-content h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .step-content p { margin: 0; font-size: 13.5px; }
+
+  /* COMMAND TABLE */
+  .cmd-table { margin: 20px 0; }
+  .cmd-row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 10px 0; border-bottom: 1px solid var(--border2);
+  }
+  .cmd-row:last-child { border-bottom: none; }
+  .cmd { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--accent5); flex-shrink: 0; min-width: 280px; }
+  .cmd-desc { font-size: 13px; color: var(--text3); }
+
+  /* NAV FOOTER */
+  .nav-footer {
+    display: flex; justify-content: space-between; gap: 16px;
+    margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text2); padding: 12px 20px; border-radius: var(--radius);
+    cursor: pointer; transition: all 0.15s; font-size: 13.5px;
+    text-decoration: none; flex: 1; max-width: 260px;
+  }
+  .nav-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .nav-btn.next { justify-content: flex-end; text-align: right; margin-left: auto; }
+  .nav-btn-label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .nav-btn-title { font-weight: 500; color: var(--text); }
+  .nav-btn:hover .nav-btn-title { color: var(--accent2); }
+
+  /* DIFF VISUAL */
+  .diff-block { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; margin: 16px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .diff-line { padding: 2px 16px; line-height: 1.8; }
+  .diff-line.added { background: rgba(86,211,100,0.1); color: #56d364; }
+  .diff-line.removed { background: rgba(247,129,102,0.1); color: #f78166; }
+  .diff-line.ctx { color: var(--text3); }
+  .diff-line.header { background: rgba(121,192,255,0.08); color: var(--accent2); }
+
+  /* BRANCH VISUAL */
+  .branch-visual {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin: 20px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    color: var(--text3); line-height: 2;
+  }
+  .br-main { color: var(--accent3); }
+  .br-feat { color: var(--accent4); }
+  .br-commit { color: var(--text2); }
+  .br-head { color: var(--accent); font-weight: bold; }
+
+  /* TAGS */
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 20px; font-weight: 500; margin: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .tag.green { background: rgba(86,211,100,0.1); color: var(--accent3); border: 1px solid rgba(86,211,100,0.25); }
+  .tag.blue { background: rgba(121,192,255,0.1); color: var(--accent2); border: 1px solid rgba(121,192,255,0.25); }
+  .tag.orange { background: rgba(255,166,87,0.1); color: var(--accent5); border: 1px solid rgba(255,166,87,0.25); }
+  .tag.red { background: rgba(247,129,102,0.1); color: var(--accent); border: 1px solid rgba(247,129,102,0.25); }
+  .tag.purple { background: rgba(210,168,255,0.1); color: var(--accent4); border: 1px solid rgba(210,168,255,0.25); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, rgba(121,192,255,0.05) 0%, rgba(247,129,102,0.05) 100%);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 40px; margin-bottom: 40px; text-align: center;
+  }
+  .hero h1 { font-size: 40px; margin-bottom: 16px; }
+  .hero p { font-size: 16px; max-width: 540px; margin: 0 auto 24px; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent2); color: #0d1117; padding: 10px 20px;
+    border-radius: var(--radius); font-weight: 600; font-size: 14px;
+    text-decoration: none; transition: opacity 0.15s; cursor: pointer; border: none;
+  }
+  .btn-primary:hover { opacity: 0.85; text-decoration: none; }
+  .btn-secondary {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 20px; border-radius: var(--radius); font-weight: 500; font-size: 14px;
+    text-decoration: none; transition: all 0.15s; cursor: pointer;
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+  /* MOBILE */
+  @media (max-width: 1200px) {
+    .toc { display: none; }
+    .main { margin-right: 0; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 32px 24px 60px; }
+    h1 { font-size: 26px; }
+    .topbar { padding: 0 16px; }
+    .hero { padding: 24px; }
+    .hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="topbar-logo" href="#" onclick="showPage('welcome')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+    </svg>
+    GitDocs
+  </a>
+  <div class="topbar-divider"></div>
+  <span class="topbar-title">Git & Github Doc - Kunal Gaikwad</span>
+  <div class="topbar-right">
+    
+    <a class="topbar-gh-btn" href="https://github.com/Kunal-debug1" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Getting Started</div>
+      <a class="sidebar-link active" onclick="showPage('welcome')" data-page="welcome">
+        <span class="dot"></span> Welcome
+      </a>
+      <a class="sidebar-link" onclick="showPage('introduction')" data-page="introduction">
+        <span class="dot"></span> Git and GitHub
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Chai aur Git</div>
+      <a class="sidebar-link" onclick="showPage('terminology')" data-page="terminology">
+        <span class="dot"></span> Terminology
+      </a>
+      <a class="sidebar-link" onclick="showPage('behind')" data-page="behind">
+        <span class="dot"></span> Git Behind the Scenes
+      </a>
+      <a class="sidebar-link" onclick="showPage('branches')" data-page="branches">
+        <span class="dot"></span> Branches in Git
+      </a>
+      <a class="sidebar-link" onclick="showPage('diff')" data-page="diff">
+        <span class="dot"></span> Diff, Stash and Tags
+      </a>
+      <a class="sidebar-link" onclick="showPage('history')" data-page="history">
+        <span class="dot"></span> Managing History
+      </a>
+      <a class="sidebar-link" onclick="showPage('github')" data-page="github">
+        <span class="dot"></span> Collaborate with GitHub
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Reference</div>
+      <a class="sidebar-link" onclick="showPage('cheatsheet')" data-page="cheatsheet">
+        <span class="dot"></span> Command Cheatsheet
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WELCOME PAGE -->
+    <article class="page active" id="page-welcome">
+      <div class="hero">
+        <div class="page-tag">Chai aur Git Series</div>
+        <h1>Git & GitHub Documentation</h1>
+        <p>A comprehensive guide to mastering version control — from zero to collaborating on real projects.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="showPage('introduction')">Start Learning →</button>
+          <button class="btn-secondary" onclick="showPage('cheatsheet')">Command Cheatsheet</button>
+        </div>
+      </div>
+
+      <h2>What you'll learn</h2>
+      <div class="cards">
+        <a class="card" onclick="showPage('introduction')">
+          <div class="card-icon">🔀</div>
+          <div class="card-title">Git Basics</div>
+          <div class="card-desc">Understand version control, install Git and create your first repository.</div>
+        </a>
+        <a class="card" onclick="showPage('branches')">
+          <div class="card-icon">🌿</div>
+          <div class="card-title">Branching & Merging</div>
+          <div class="card-desc">Work in parallel with branches, resolve conflicts, fast-forward and 3-way merges.</div>
+        </a>
+        <a class="card" onclick="showPage('diff')">
+          <div class="card-icon">🔍</div>
+          <div class="card-title">Diff, Stash & Tags</div>
+          <div class="card-desc">Compare changes, save work-in-progress and mark release versions.</div>
+        </a>
+        <a class="card" onclick="showPage('history')">
+          <div class="card-icon">⏳</div>
+          <div class="card-title">History Management</div>
+          <div class="card-desc">Rebase for cleaner history and recover lost commits with reflog.</div>
+        </a>
+        <a class="card" onclick="showPage('github')">
+          <div class="card-icon">🚀</div>
+          <div class="card-title">GitHub Collaboration</div>
+          <div class="card-desc">Push to remote repos, set up SSH, pull requests and team workflow.</div>
+        </a>
+        <a class="card" onclick="showPage('behind')">
+          <div class="card-icon">⚙️</div>
+          <div class="card-title">Internals</div>
+          <div class="card-desc">Dive into commit objects, tree objects and blob storage under the hood.</div>
+        </a>
+      </div>
+
+      <h2>Learning Path</h2>
+      <p>This guide is structured progressively. Follow these steps in order:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Get the basics</h4><p>Learn what Git is, install it, and understand core concepts like repository, commit and staging area.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Use it daily</h4><p>Add files, commit changes, create branches, and build a habit of version-controlling your work.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Face the problems</h4><p>Hit merge conflicts, deal with detached HEAD state, or accidentally deleted commits — it's normal!</p></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><h4>Solve them</h4><p>Use stash, rebase, reflog and diff to navigate and fix tricky situations.</p></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><h4>Collaborate</h4><p>Push to GitHub with SSH, work with teams via pull requests, fork and upstream remotes.</p></div></div>
+      </div>
+
+      <div class="nav-footer">
+        <button class="nav-btn next" onclick="showPage('introduction')">
+          <div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Git and GitHub →</span></div>
+        </button>
+      </div>
+    </article>
+
+    <!-- INTRODUCTION PAGE -->
+    <article class="page" id="page-introduction">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Git and GitHub</span></div>
+      <div class="page-tag">Introduction</div>
+      <h1>Git and GitHub</h1>
+      <p class="page-subtitle">Learn the fundamentals of version control and understand how Git differs from GitHub.</p>
+      <hr class="page-divider">
+
+      <h2>Git and GitHub are different</h2>
+      <p><strong>Git</strong> is a version control system used to track changes to your files. It is free, open-source, and available for Windows, macOS, and Linux. Git is installed as software directly on your computer.</p>
+      <p><strong>GitHub</strong> is a web-based hosting platform for Git repositories. It allows you to store and share code with others online. While GitHub is the most popular provider, alternatives include Gitlab, Bitbucket and Azure Repos.</p>
+
+      <div class="cards" style="grid-template-columns: 1fr 1fr; margin-top: 16px;">
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🖥️</div>
+          <div class="card-title">Git</div>
+          <div class="card-desc">Local software. Tracks file changes. Works offline. Installed on your machine.</div>
+        </div>
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">☁️</div>
+          <div class="card-title">GitHub</div>
+          <div class="card-desc">Remote platform. Hosts repos online. Enables team collaboration. Accessed via browser or CLI.</div>
+        </div>
+      </div>
+
+      <h2>Version Control Systems</h2>
+      <p>Version control systems manage the history of your code. Think of them as <strong>checkpoints in a video game</strong> — you can move to any point in history and always go back to a previous checkpoint.</p>
+      <p>Before Git became mainstream, systems like SCCS (Source Code Control System) were used, but they were proprietary and expensive. Git was created to replace them. Other version control systems include <code>Subversion (SVN)</code>, <code>CVS</code>, and <code>Perforce</code>.</p>
+
+      <div class="callout info">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>Git was created by <strong>Linus Torvalds</strong> in 2005 to manage Linux kernel development. It was designed to be fast, distributed, and handle large projects efficiently.</p></div>
+      </div>
+
+      <h2>Install Git</h2>
+      <p>Download Git from the official website or use your system's package manager:</p>
+
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># macOS (via Homebrew)
+brew install git
+
+# Ubuntu / Debian
+sudo apt-get install git
+
+# Windows — download from:
+# https://git-scm.com/downloads</code></pre>
+
+      <p>Verify your installation:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git --version
+# git version 2.43.0</code></pre>
+
+      <h2>Account on GitHub</h2>
+      <p>Create a free account at <a href="https://github.com" target="_blank">github.com</a>. You'll need it later when we set up SSH keys to push code to remote repositories. Password authentication is no longer recommended — SSH key authentication is the standard.</p>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('welcome')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Welcome</span></div></button>
+        <button class="nav-btn next" onclick="showPage('terminology')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Terminology →</span></div></button>
+      </div>
+    </article>
+
+    <!-- TERMINOLOGY PAGE -->
+    <article class="page" id="page-terminology">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Terminology</span></div>
+      <div class="page-tag">Core Concepts</div>
+      <h1>Terminology</h1>
+      <p class="page-subtitle">Git uses its own vocabulary. Here's what every term means and how to use the key commands.</p>
+      <hr class="page-divider">
+
+      <h2>Repository</h2>
+      <p>A <strong>repository</strong> (repo) is a folder tracked by Git. It's not just storage — it maintains a full history of every change. Any folder can become a repo:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git init          # Initialize a new repo (creates .git/ folder)
+git status        # Check the current state of your repo</code></pre>
+
+      <h2>Config Settings</h2>
+      <p>Every commit records who made it. Set your identity globally:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git config --list   # View all settings</code></pre>
+
+      <h2>The Complete Git Flow</h2>
+      <p>The typical workflow from creating a file to pushing it to GitHub:</p>
+      <div class="branch-visual">
+        <span class="br-main">Working Directory</span> → <span class="br-feat">Staging Area</span> → <span class="br-commit">Local Repository</span> → <span class="br-head">Remote (GitHub)</span><br>
+        <span class="br-main">  (edit files)  </span>   <span class="br-feat">  git add  </span>     <span class="br-commit">  git commit  </span>     <span class="br-head">  git push  </span>
+      </div>
+
+      <h2>Stage</h2>
+      <p>Staging tells Git which changes to include in the next commit. Files in the staging area are <em>ready to be committed</em> but not yet saved permanently:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git add index.html          # Stage a single file
+git add .                   # Stage all changes
+git status                  # See staged vs unstaged files</code></pre>
+
+      <h2>Commit</h2>
+      <p>A commit is a <strong>permanent snapshot</strong> of your staged changes. Each commit gets a unique hash ID.</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git commit -m "Add homepage layout"
+git log           # Full commit history
+git log --oneline # Compact one-line view</code></pre>
+
+      <div class="callout warn">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>Omitting the <code>-m</code> flag opens your default editor (usually Vim). You can change this to VS Code: <code>git config --global core.editor "code --wait"</code></p></div>
+      </div>
+
+      <h2>Atomic Commits</h2>
+      <p>Each commit should be a <strong>single, self-contained unit of work</strong>. This makes it easy to revert specific changes without breaking other things. A good commit message is: <em>feat: add user authentication</em> — not <em>changes</em>.</p>
+
+      <h2>.gitignore</h2>
+      <p>The <code>.gitignore</code> file lists files and folders that Git should never track:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">.gitignore</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>node_modules/
+.env
+.vscode/
+dist/
+*.log</code></pre>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('introduction')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Git and GitHub</span></div></button>
+        <button class="nav-btn next" onclick="showPage('behind')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Git Behind the Scenes →</span></div></button>
+      </div>
+    </article>
+
+    <!-- BEHIND THE SCENES PAGE -->
+    <article class="page" id="page-behind">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Behind the Scenes</span></div>
+      <div class="page-tag">Internals</div>
+      <h1>Git Behind the Scenes</h1>
+      <p class="page-subtitle">How Git internally stores every change — snapshots, objects and hash codes.</p>
+      <hr class="page-divider">
+
+      <h2>Git Snapshots</h2>
+      <p>Every time you commit, Git doesn't just record <em>diffs</em> — it stores a full snapshot of your project as it exists at that moment. Each snapshot is identified by a <strong>SHA-1 hash</strong> — a 40-character string uniquely identifying the contents.</p>
+      <p>This snapshot system is backed by a <strong>key-value object database</strong> inside the <code>.git/</code> folder. There are three core object types.</p>
+
+      <h2>The 3 Musketeers of Git</h2>
+      <div class="git-objects">
+        <div class="git-obj">
+          <div class="git-obj-type commit">Commit Object</div>
+          <ul>
+            <li>Points to a Tree Object</li>
+            <li>Points to parent commit</li>
+            <li>Author + Committer</li>
+            <li>Commit message</li>
+            <li>Timestamp</li>
+          </ul>
+        </div>
+        <div class="git-obj">
+          <div class="git-obj-type tree">Tree Object</div>
+          <ul>
+            <li>Container for files/dirs</li>
+            <li>File mode (permissions)</li>
+            <li>File name → hash mapping</li>
+            <li>Points to Blob Objects</li>
+            <li>Can point to sub-Trees</li>
+          </ul>
+        </div>
+        <div class="git-obj">
+          <div class="git-obj-type blob">Blob Object</div>
+          <ul>
+            <li>Raw file content</li>
+            <li>No filename stored here</li>
+            <li>Same content = same hash</li>
+            <li>Stored in .git/objects/</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>If two files have identical content, Git stores only <em>one</em> Blob Object. The filename lives in the Tree Object, not the Blob — this is why Git is so storage-efficient.</p></div>
+      </div>
+
+      <h2>Exploring Internals</h2>
+      <p>You can inspect Git's objects directly with these plumbing commands:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># View raw commit data
+git show -s --pretty=raw &lt;commit-hash&gt;
+
+# List files in a tree object
+git ls-tree &lt;tree-id&gt;
+
+# View a blob's content
+git show &lt;blob-id&gt;
+
+# Pretty-print any object
+git cat-file -p &lt;object-id&gt;</code></pre>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('terminology')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Terminology</span></div></button>
+        <button class="nav-btn next" onclick="showPage('branches')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Branches in Git →</span></div></button>
+      </div>
+    </article>
+
+    <!-- BRANCHES PAGE -->
+    <article class="page" id="page-branches">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Branches</span></div>
+      <div class="page-tag">Branching</div>
+      <h1>Branches in Git</h1>
+      <p class="page-subtitle">Work on multiple features simultaneously without affecting the main codebase.</p>
+      <hr class="page-divider">
+
+      <h2>What is a Branch?</h2>
+      <p>A branch is an independent line of development. Multiple developers can work on different features in parallel — one on a header, another on a footer, another on auth — without stepping on each other's code.</p>
+
+      <div class="branch-visual">
+        <span class="br-main">main</span>:    ●──●──●──────────────●  (merge commit)<br>
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱<br>
+        <span class="br-feat">feature</span>:              ●──●──●
+      </div>
+
+      <h2>HEAD in Git</h2>
+      <p><code>HEAD</code> is a special pointer that always points to your <strong>current branch's latest commit</strong>. When you switch branches, HEAD moves with you. The default branch is now called <code>main</code> (previously <code>master</code>) — it's just a convention, nothing special.</p>
+
+      <h2>Branch Commands</h2>
+      <div class="cmd-table">
+        <div class="cmd-row"><div class="cmd">git branch</div><div class="cmd-desc">List all local branches</div></div>
+        <div class="cmd-row"><div class="cmd">git branch &lt;name&gt;</div><div class="cmd-desc">Create a new branch</div></div>
+        <div class="cmd-row"><div class="cmd">git switch &lt;name&gt;</div><div class="cmd-desc">Switch to a branch (modern way)</div></div>
+        <div class="cmd-row"><div class="cmd">git switch -c &lt;name&gt;</div><div class="cmd-desc">Create and switch in one step</div></div>
+        <div class="cmd-row"><div class="cmd">git checkout &lt;name&gt;</div><div class="cmd-desc">Switch to a branch (classic way)</div></div>
+        <div class="cmd-row"><div class="cmd">git branch -m &lt;old&gt; &lt;new&gt;</div><div class="cmd-desc">Rename a branch</div></div>
+        <div class="cmd-row"><div class="cmd">git branch -d &lt;name&gt;</div><div class="cmd-desc">Delete a branch (safe)</div></div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>Always <strong>commit your work before switching branches</strong>. Uncommitted changes can cause conflicts or get overwritten when you switch.</p></div>
+      </div>
+
+      <h2>Merging Branches</h2>
+      <p>Merging brings changes from one branch into another. Git has two merge strategies:</p>
+
+      <h3>Fast-Forward Merge</h3>
+      <p>Used when the target branch has no new commits since the feature branch was created. Git simply moves the pointer forward — no merge commit needed.</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git checkout main
+git merge bug-fix      # Fast-forward: no conflicts, clean history</code></pre>
+
+      <h3>3-Way Merge</h3>
+      <p>Used when both branches have diverged (both have new commits). Git looks at 3 commits: the <strong>common ancestor</strong> + the <strong>tip of each branch</strong>, then creates a new <em>merge commit</em>.</p>
+      <p>Conflicts arise when both branches modified the same lines. You must <strong>manually resolve</strong> them — there are no shortcuts.</p>
+
+      <div class="callout success">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>VS Code has an excellent built-in merge conflict editor. Look for "Accept Current Change", "Accept Incoming Change", or "Accept Both" options highlighted inline.</p></div>
+      </div>
+
+      <h2>Managing Conflicts</h2>
+      <p>Conflict resolution isn't scary — it's about communication with your team. When Git marks a conflict, it looks like this:</p>
+      <div class="diff-block">
+        <div class="diff-line ctx">function greet() {</div>
+        <div class="diff-line header">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</div>
+        <div class="diff-line added">  return "Hello World";</div>
+        <div class="diff-line header">=======</div>
+        <div class="diff-line removed">  return "Hi there!";</div>
+        <div class="diff-line header">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-branch</div>
+        <div class="diff-line ctx">}</div>
+      </div>
+      <p>Choose which version to keep (or combine them), then <code>git add</code> the resolved file and commit.</p>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('behind')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Git Behind the Scenes</span></div></button>
+        <button class="nav-btn next" onclick="showPage('diff')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Diff, Stash and Tags →</span></div></button>
+      </div>
+    </article>
+
+    <!-- DIFF, STASH, TAGS PAGE -->
+    <article class="page" id="page-diff">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Diff, Stash and Tags</span></div>
+      <div class="page-tag">Advanced Commands</div>
+      <h1>Diff, Stash and Tags</h1>
+      <p class="page-subtitle">Powerful but often overlooked commands for debugging, context-switching and release management.</p>
+      <hr class="page-divider">
+
+      <h2>Git Diff</h2>
+      <p><code>git diff</code> compares different versions of files. Git treats the before and after as two separate files and highlights exactly what changed:</p>
+
+      <table>
+        <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>a/</code></td><td>The original file (before changes)</td></tr>
+          <tr><td><code>b/</code></td><td>The updated file (after changes)</td></tr>
+          <tr><td><code>---</code></td><td>Marks the start of the original file section</td></tr>
+          <tr><td><code>+++</code></td><td>Marks the start of the updated file section</td></tr>
+          <tr><td><code>@@</code></td><td>Shows line numbers where changes occur</td></tr>
+          <tr><td><code>-</code> (red)</td><td>Removed line</td></tr>
+          <tr><td><code>+</code> (green)</td><td>Added line</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cmd-table">
+        <div class="cmd-row"><div class="cmd">git diff</div><div class="cmd-desc">Unstaged changes (working dir vs staging)</div></div>
+        <div class="cmd-row"><div class="cmd">git diff --staged</div><div class="cmd-desc">Staged changes (staging vs last commit)</div></div>
+        <div class="cmd-row"><div class="cmd">git diff &lt;branch1&gt; &lt;branch2&gt;</div><div class="cmd-desc">Compare two branches</div></div>
+        <div class="cmd-row"><div class="cmd">git diff &lt;hash1&gt; &lt;hash2&gt;</div><div class="cmd-desc">Compare two specific commits</div></div>
+      </div>
+
+      <h2>Git Stash</h2>
+      <p>Stash is a <strong>temporary clipboard</strong> for uncommitted work. When you need to switch branches but aren't ready to commit, stash saves your changes to a stack:</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git stash                              # Save changes to stash
+git stash save "WIP: login feature"   # Save with a name
+git stash list                        # View all stashes
+git stash apply                       # Apply most recent stash
+git stash apply stash@{0}             # Apply specific stash
+git stash pop                         # Apply + remove from list
+git stash drop                        # Remove most recent stash
+git stash clear                       # Remove all stashes</code></pre>
+
+      <h2>Git Tags</h2>
+      <p>Tags are <strong>permanent bookmarks</strong> on specific commits — ideal for marking release versions like <code>v1.0.0</code>. Unlike branches, tags don't move when new commits are added.</p>
+
+      <h3>Lightweight vs Annotated Tags</h3>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># Lightweight tag (just a pointer)
+git tag v1.0.0
+
+# Annotated tag (stores metadata — preferred for releases)
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# Tag a specific commit
+git tag v0.9.0 &lt;commit-hash&gt;
+
+# List all tags
+git tag
+
+# Push tags to remote
+git push origin v1.0.0
+git push origin --tags     # Push all tags
+
+# Delete a tag
+git tag -d v1.0.0
+git push origin :v1.0.0    # Delete from remote</code></pre>
+
+      <div class="callout info">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>Always use <strong>annotated tags</strong> for releases — they store the tagger name, date, and a message, making them much more useful for changelogs and auditing.</p></div>
+      </div>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('branches')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Branches in Git</span></div></button>
+        <button class="nav-btn next" onclick="showPage('history')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Managing History →</span></div></button>
+      </div>
+    </article>
+
+    <!-- MANAGING HISTORY PAGE -->
+    <article class="page" id="page-history">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Managing History</span></div>
+      <div class="page-tag">History</div>
+      <h1>Managing History</h1>
+      <p class="page-subtitle">Keep your project history clean with rebase, and recover anything with reflog.</p>
+      <hr class="page-divider">
+
+      <h2>Merge Commits</h2>
+      <p>A <strong>merge commit</strong> is automatically created during a 3-way merge. It has two parents and preserves the full history of both branches. This results in a non-linear history that explicitly shows when and where branches were merged.</p>
+
+      <h2>Rebase in Git</h2>
+      <p>Rebase rewrites commit history by <strong>replaying your branch's commits on top of another branch</strong>. The result is a clean, linear history — as if you had started your feature branch from the latest commit on main.</p>
+
+      <div class="branch-visual">
+        <span style="color:var(--text3)">Before rebase:</span><br>
+        <span class="br-main">main</span>:    A──B──C<br>
+                                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲<br>
+        <span class="br-feat">feature</span>:     D──E<br><br>
+        <span style="color:var(--text3)">After rebase (feature onto main):</span><br>
+        <span class="br-main">main</span>:    A──B──C<br>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲<br>
+        <span class="br-feat">feature</span>:           D'──E'
+      </div>
+
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># Switch to your feature branch
+git checkout feature-branch
+
+# Rebase onto main (replay your commits on top of main)
+git rebase main
+
+# If conflicts arise, resolve them, then:
+git add &lt;resolved-files&gt;
+git rebase --continue
+
+# To abort the rebase entirely:
+git rebase --abort</code></pre>
+
+      <div class="callout danger">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p><strong>Never rebase shared public branches.</strong> Rebasing rewrites commit hashes, which breaks history for anyone else who has those commits. Only rebase local, unshared branches. Avoid <code>--force</code> unless you know exactly what you're doing.</p></div>
+      </div>
+
+      <h2>Git Reflog</h2>
+      <p>Reflog is your <strong>safety net</strong>. It records every movement of HEAD — even actions that aren't in regular <code>git log</code> output, like resets and rebases. This means you can recover almost anything.</p>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># View the full reflog
+git reflog
+
+# Example output:
+# a3f8d21 HEAD@{0}: commit: add dark mode
+# b9c1e45 HEAD@{1}: rebase (finish): refs/heads/feature
+# c2d7f90 HEAD@{2}: checkout: moving from main to feature
+
+# Recover a lost commit or branch
+git reset --hard &lt;commit-hash&gt;
+# or using HEAD reference:
+git reset --hard HEAD@{2}</code></pre>
+
+      <div class="callout success">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>Reflog is local and expires after ~90 days by default. It cannot recover work that was never committed. Always commit (or stash) before risky operations!</p></div>
+      </div>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('diff')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Diff, Stash and Tags</span></div></button>
+        <button class="nav-btn next" onclick="showPage('github')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Collaborate with GitHub →</span></div></button>
+      </div>
+    </article>
+
+    <!-- GITHUB COLLABORATION PAGE -->
+    <article class="page" id="page-github">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Collaborate with GitHub</span></div>
+      <div class="page-tag">GitHub</div>
+      <h1>Collaborate with GitHub</h1>
+      <p class="page-subtitle">Push your code to the cloud, set up SSH authentication, and collaborate with your team.</p>
+      <hr class="page-divider">
+
+      <h2>What is GitHub?</h2>
+      <p>GitHub is a web-based Git repository hosting service — the most popular platform for open-source and team development. Alternatives include <span class="tag blue">GitLab</span> <span class="tag orange">Bitbucket</span> <span class="tag green">Azure Repos</span> <span class="tag purple">Gitea</span>, but GitHub dominates the ecosystem.</p>
+
+      <h2>Configuring Git</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git config --list</code></pre>
+
+      <h2>Setup SSH Key</h2>
+      <p>Password authentication is deprecated. SSH keys are the secure, recommended way to authenticate with GitHub:</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Generate an SSH key</h4>
+            <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>ssh-keygen -t ed25519 -C "you@example.com"</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Save the key</h4>
+            <p>Press <strong>Enter</strong> to accept the default location (<code>~/.ssh/id_ed25519</code>). Optionally add a passphrase for extra security.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Add to ssh-agent</h4>
+            <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Add public key to GitHub</h4>
+            <p>Copy the output of <code>cat ~/.ssh/id_ed25519.pub</code>, then go to <strong>GitHub → Settings → SSH and GPG Keys → New SSH Key</strong> and paste it.</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Publish Code to Remote</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;">
+        <span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code># 1. Initialize and commit locally
+git init
+git add .
+git commit -m "Initial commit"
+
+# 2. Add remote repository
+git remote add origin git@github.com:username/repo.git
+
+# 3. Check your remote
+git remote -v
+
+# 4. Push and set upstream (first time)
+git push -u origin main
+
+# After that, just:
+git push</code></pre>
+
+      <h2>Getting Code from Remote</h2>
+      <div class="cmd-table">
+        <div class="cmd-row"><div class="cmd">git fetch origin</div><div class="cmd-desc">Download changes but don't merge</div></div>
+        <div class="cmd-row"><div class="cmd">git pull origin main</div><div class="cmd-desc">Download + merge into current branch</div></div>
+        <div class="cmd-row"><div class="cmd">git clone &lt;url&gt;</div><div class="cmd-desc">Copy a full remote repo to local</div></div>
+        <div class="cmd-row"><div class="cmd">git remote add upstream &lt;url&gt;</div><div class="cmd-desc">Track the original repo (for forks)</div></div>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-icon"></div>
+        <div class="callout-body"><p>🎉 <strong>Congratulations!</strong> You've completed the Chai aur Git series. You now understand version control from core concepts to real-world collaboration on GitHub. Keep practicing and happy coding!</p></div>
+      </div>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('history')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Managing History</span></div></button>
+        <button class="nav-btn next" onclick="showPage('cheatsheet')"><div><span class="nav-btn-label">Next</span><span class="nav-btn-title">Command Cheatsheet →</span></div></button>
+      </div>
+    </article>
+
+    <!-- CHEATSHEET PAGE -->
+    <article class="page" id="page-cheatsheet">
+      <div class="breadcrumb"><a onclick="showPage('welcome')">Docs</a><span class="breadcrumb-sep">/</span><span>Cheatsheet</span></div>
+      <div class="page-tag">Reference</div>
+      <h1>Command Cheatsheet</h1>
+      <p class="page-subtitle">All the essential Git commands in one place.</p>
+      <hr class="page-divider">
+
+      <h2>Setup</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git --version
+git config --global user.name "Name"
+git config --global user.email "email"
+git config --global core.editor "code --wait"
+git config --list</code></pre>
+
+      <h2>Repository Basics</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git init                    # Initialize new repo
+git clone &lt;url&gt;             # Clone remote repo
+git status                  # Check current state
+git add &lt;file&gt;              # Stage a file
+git add .                   # Stage all changes
+git commit -m "message"     # Commit staged changes
+git log                     # View commit history
+git log --oneline           # Compact history</code></pre>
+
+      <h2>Branching</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git branch                  # List branches
+git branch &lt;name&gt;           # Create branch
+git switch &lt;name&gt;           # Switch branch
+git switch -c &lt;name&gt;        # Create + switch
+git merge &lt;branch&gt;          # Merge into current
+git branch -d &lt;name&gt;        # Delete branch
+git branch -m &lt;old&gt; &lt;new&gt;   # Rename branch</code></pre>
+
+      <h2>Diff & Stash</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git diff                    # Unstaged changes
+git diff --staged           # Staged changes
+git diff &lt;branch1&gt; &lt;branch2&gt;
+git stash                   # Stash changes
+git stash list              # List stashes
+git stash pop               # Apply + drop stash
+git stash apply stash@{0}   # Apply specific stash
+git stash clear             # Clear all stashes</code></pre>
+
+      <h2>Remote & GitHub</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git remote -v               # List remotes
+git remote add origin &lt;url&gt; # Add remote
+git push -u origin main     # Push + set upstream
+git push                    # Push (after -u set)
+git fetch origin            # Fetch (no merge)
+git pull origin main        # Fetch + merge
+git pull                    # Pull (after -u set)</code></pre>
+
+      <h2>History Management</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git rebase &lt;branch&gt;         # Rebase current onto branch
+git rebase --continue       # Continue after conflict
+git rebase --abort          # Abort rebase
+git reflog                  # View HEAD history
+git reset --hard &lt;hash&gt;     # Reset to commit</code></pre>
+
+      <h2>Tags</h2>
+      <div class="pre-header" style="background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 16px;display:flex;justify-content:space-between;"><span class="pre-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin-top:0;border-radius:0 0 6px 6px;"><code>git tag                     # List tags
+git tag v1.0.0              # Lightweight tag
+git tag -a v1.0.0 -m "msg"  # Annotated tag
+git push origin v1.0.0      # Push tag
+git tag -d v1.0.0           # Delete local tag</code></pre>
+
+      <div class="nav-footer">
+        <button class="nav-btn" onclick="showPage('github')">← <div><span class="nav-btn-label">Previous</span><span class="nav-btn-title">Collaborate with GitHub</span></div></button>
+        <button class="nav-btn next" onclick="showPage('welcome')"><div><span class="nav-btn-label">Back to Start</span><span class="nav-btn-title">Welcome →</span></div></button>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- TOC -->
+  <aside class="toc" id="toc">
+    <div class="toc-title">On this page</div>
+    <div id="toc-links"></div>
+  </aside>
+</div>
+
+<script>
+const pages = {
+  welcome: {
+    toc: []
+  },
+  introduction: {
+    toc: ['Git and GitHub are different', 'Version Control Systems', 'Install Git', 'Account on GitHub']
+  },
+  terminology: {
+    toc: ['Repository', 'Config Settings', 'The Complete Git Flow', 'Stage', 'Commit', 'Atomic Commits', '.gitignore']
+  },
+  behind: {
+    toc: ['Git Snapshots', 'The 3 Musketeers of Git', 'Exploring Internals']
+  },
+  branches: {
+    toc: ['What is a Branch?', 'HEAD in Git', 'Branch Commands', 'Merging Branches', 'Managing Conflicts']
+  },
+  diff: {
+    toc: ['Git Diff', 'Git Stash', 'Git Tags']
+  },
+  history: {
+    toc: ['Merge Commits', 'Rebase in Git', 'Git Reflog']
+  },
+  github: {
+    toc: ['What is GitHub?', 'Configuring Git', 'Setup SSH Key', 'Publish Code to Remote', 'Getting Code from Remote']
+  },
+  cheatsheet: {
+    toc: ['Setup', 'Repository Basics', 'Branching', 'Diff & Stash', 'Remote & GitHub', 'History Management', 'Tags']
+  }
+};
+
+function showPage(id) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+
+  // Show target
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+
+  // Highlight sidebar
+  const link = document.querySelector(`.sidebar-link[data-page="${id}"]`);
+  if (link) link.classList.add('active');
+
+  // Build TOC
+  const toc = document.getElementById('toc-links');
+  toc.innerHTML = '';
+  if (pages[id] && pages[id].toc.length > 0) {
+    pages[id].toc.forEach(item => {
+      const a = document.createElement('a');
+      a.className = 'toc-link';
+      a.textContent = item;
+      a.onclick = () => {
+        // Scroll to h2 with matching text
+        const h2s = page.querySelectorAll('h2');
+        for (const h of h2s) {
+          if (h.textContent.trim() === item) {
+            h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            break;
+          }
+        }
+      };
+      toc.appendChild(a);
+    });
+  }
+
+  window.scrollTo({ top: 0 });
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.pre-header').nextElementSibling;
+  const code = pre ? pre.querySelector('code') : null;
+  if (code) {
+    navigator.clipboard.writeText(code.textContent.trim()).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+}
+
+// Initialize
+showPage('welcome');
+</script>
+</body>
+</html>
